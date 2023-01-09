@@ -1,0 +1,39 @@
+import 'package:shamo/models/product_model.dart';
+
+Future<List<Product>> getAllProducts() async {
+  String basicAuth =
+      'Basic ' + base64Encode(utf8.encode('$username:$password'));
+  print(basicAuth);
+
+//Removed the product type
+
+  var r = await http.get(
+      Uri.parse('https://website/wp-json/wc/v3/products?post_per_page=1'),
+      headers: <String, String>{'authorization': basicAuth});
+
+//Made your code a little more readable here
+  if (r.statusCode == 200) {
+    String data = response.body;
+    var decodedData = json.decode(data);
+    return decodedData;
+  } else {
+    return r.statusCode;
+  }
+
+//Now to get a list of products you need a new function
+
+  Future<List<Product>> getProductsList() async {
+    //Here we will call the data from the API into a variable
+    var products = await getAllProducts();
+    List<ProductModel> productList = [];
+
+    for (p in products) {
+      
+
+      //Here we are going to add each of the items to the list above
+
+      productList.add(ProductModel.fromjson(p));
+    }
+    return productList;
+  }
+}
